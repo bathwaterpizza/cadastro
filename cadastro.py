@@ -1,7 +1,7 @@
 import os, json, atexit, copy
 
 # Exportando funções de acesso
-__all__ = ["add_cadastro", "del_cadastro", "get_cadastro_by_login", "get_cadastro_by_id", "login", "is_aluno", "is_professor", "is_admin"]
+__all__ = ["add_cadastro", "del_cadastro", "get_cadastro_by_login", "get_cadastro_by_id_e_tipo", "login", "is_aluno", "is_professor", "is_admin"]
 
 # Globais
 _SCRIPT_DIR_PATH: str = os.path.dirname(os.path.realpath(__file__))
@@ -58,8 +58,8 @@ def add_cadastro(login: str, senha: str, id_usuario: int, acesso: str) -> tuple[
         if cadastro["login"] == login:
             # Login já existe
             return 46, None
-        elif cadastro["id"] == id_usuario:
-            # ID já existe
+        elif cadastro["id"] == id_usuario and cadastro["tipo_acesso"] == acesso:
+            # ID já existe para esse tipo de usuário
             return 47, None
     
     novo_cadastro = {
@@ -72,17 +72,17 @@ def add_cadastro(login: str, senha: str, id_usuario: int, acesso: str) -> tuple[
 
     return 0, None
 
-def del_cadastro(id_usuario: int) -> tuple[int, None]:
+def del_cadastro(login: str) -> tuple[int, None]:
     """
-    Remove um usuário do sistema
+    Remove um usuário do sistema pelo seu login
     """
     for i, cadastro in enumerate(_cadastros):
-        if cadastro["id"] == id_usuario and cadastro["tipo_acesso"] != "admin":
+        if cadastro["login"] == login and cadastro["tipo_acesso"] != "admin":
             del _cadastros[i]
             return 0, None
 
-    # ID não encontrado
-    return 48, None
+    # Login não encontrado
+    return 49, None
 
 def get_cadastro_by_login(login: str) -> tuple[int, dict]:
     """
@@ -95,15 +95,15 @@ def get_cadastro_by_login(login: str) -> tuple[int, dict]:
     # Login não encontrado
     return 49, None # type: ignore
 
-def get_cadastro_by_id(id_usuario: int) -> tuple[int, dict]:
+def get_cadastro_by_id_e_tipo(id_usuario: int, acesso: str) -> tuple[int, dict]:
     """
-    Retorna o cadastro de um usuário pelo seu ID
+    Retorna o cadastro de um usuário pelo seu ID e tipo de acesso
     """
     for cadastro in _cadastros:
-        if cadastro["id"] == id_usuario:
+        if cadastro["id"] == id_usuario and cadastro["tipo_acesso"] == acesso:
             return 0, copy.deepcopy(cadastro)
 
-    # ID não encontrado
+    # ID + tipo de aceso não encontrado
     return 48, None # type: ignore
 
 def login(login: str, senha: str) -> tuple[int, int]:
@@ -124,38 +124,38 @@ def login(login: str, senha: str) -> tuple[int, int]:
     # Login não encontrado
     return 49, None # type: ignore
 
-def is_aluno(id_usuario: int) -> tuple[int, bool]:
+def is_aluno(login: str) -> tuple[int, bool]:
     """
     Retorna se o usuário é um aluno
     """
     for cadastro in _cadastros:
-        if cadastro["id"] == id_usuario:
+        if cadastro["login"] == login:
             return 0, cadastro["tipo_acesso"] == "aluno"
 
-	# ID não encontrado
-    return 48, None # type: ignore
+    # Login não encontrado
+    return 49, None # type: ignore
 
-def is_professor(id_usuario: int) -> tuple[int, bool]:
+def is_professor(login: str) -> tuple[int, bool]:
     """
     Retorna se o usuário é um professor
     """
     for cadastro in _cadastros:
-        if cadastro["id"] == id_usuario:
+        if cadastro["login"] == login:
             return 0, cadastro["tipo_acesso"] == "professor"
 
-	# ID não encontrado
-    return 48, None # type: ignore
+    # Login não encontrado
+    return 49, None # type: ignore
 
-def is_admin(id_usuario: int) -> tuple[int, bool]:
+def is_admin(login: str) -> tuple[int, bool]:
     """
     Retorna se o usuário é um admin
     """
     for cadastro in _cadastros:
-        if cadastro["id"] == id_usuario:
+        if cadastro["login"] == login:
             return 0, cadastro["tipo_acesso"] == "admin"
 
-    # ID não encontrado
-    return 48, None # type: ignore
+    # Login não encontrado
+    return 49, None # type: ignore
 
 # Setup
 # Popula lista
