@@ -108,7 +108,7 @@ def get_cadastro_by_id(id_usuario: int) -> tuple[int, dict]:
 
 def login(login: str, senha: str) -> tuple[int, int]:
     """
-    Realiza o login de um usuário
+    Verifica o login de um usuário
     
     Retorna o ID do usuário (-1 se for admin), ou None + erro se não encontrado
     """
